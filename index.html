@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neon Syndicate - Rust Clan</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #000;
+      color: #0ff;
+      text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Loading Screen */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #2e1a0f, #000000 80%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      color: #ff4f00;
+      font-size: 2rem;
+      font-weight: bold;
+      text-shadow:
+        0 0 5px #ff4f00,
+        0 0 20px #ff4f00,
+        0 0 30px #ff4f00,
+        0 0 40px #ff4f00;
+      user-select: none;
+    }
+
+    /* Rust-style rotating spinner */
+    .spinner {
+      margin-top: 2rem;
+      width: 60px;
+      height: 60px;
+      border: 6px solid #ff4f00;
+      border-top: 6px solid transparent;
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+      box-shadow:
+        0 0 10px #ff4f00,
+        0 0 20px #ff4f00;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+
+    /* Main layout */
+    .chat-box {
+      width: 320px;
+      background: linear-gradient(145deg, #001111, #003333);
+      border-right: 2px solid #0ff;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 1.5rem;
+      box-shadow: 0 0 15px #0ff inset;
+      display: flex;
+      flex-direction: column;
+      scroll-behavior: smooth;
+      flex-shrink: 0;
+    }
+
+    .chat-box h2 {
+      color: #00ffff;
+      text-align: center;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 15px #00ffff;
+      user-select: none;
+    }
+
+    .chat-message {
+      margin-bottom: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      background: rgba(0, 255, 255, 0.1);
+      border-left: 4px solid #0ff;
+      box-shadow: 0 0 8px #0ff;
+      color: #b0ffff;
+      font-weight: 500;
+      font-size: 0.9rem;
+      line-height: 1.3;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.6s ease, transform 0.3s ease;
+    }
+
+    .chat-message.show {
+      display: block;
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .chat-message strong {
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+      font-weight: 700;
+      margin-right: 0.5rem;
+      user-select: none;
+    }
+
+    .chat-message p {
+      margin: 0;
+      color: #ccf8ff;
+      user-select: text;
+    }
+
+    .chat-message:hover {
+      background: rgba(0, 255, 255, 0.15);
+      box-shadow: 0 0 15px #00ffff;
+      cursor: default;
+    }
+
+    .main {
+      flex-grow: 1;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 2rem;
+      text-align: center;
+      border-bottom: 2px solid #0ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* Neon Landlords Logo styles */
+    .neon-logo {
+      font-size: 4rem;
+      font-weight: bold;
+      color: #0ff;
+      text-shadow:
+        0 0 5px #0ff,
+        0 0 10px #0ff,
+        0 0 20px #0ff,
+        0 0 40px #00ffff;
+      animation: neonPulse 3s ease-in-out infinite;
+      user-select: none;
+    }
+
+    @keyframes neonPulse {
+      0%, 100% {
+        text-shadow:
+          0 0 5px #0ff,
+          0 0 10px #0ff,
+          0 0 20px #0ff,
+          0 0 40px #00ffff;
+        transform: scale(1);
+      }
+      50% {
+        text-shadow:
+          0 0 10px #0ff,
+          0 0 20px #0ff,
+          0 0 40px #00ffff,
+          0 0 60px #00ffff;
+        transform: scale(1.1);
+      }
+    }
+
+    #server-status {
+      margin-top: 1rem;
+      font-size: 1.5rem;
+      color: #0ff;
+      text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+    }
+
+    .buttons {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .buttons button {
+      background-color: transparent;
+      border: 2px solid #0ff;
+      color: #0ff;
+      padding: 0.5rem 1.5rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .buttons button:hover {
+      background-color: #0ff;
+      color: #000;
+    }
+
+    .members {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 2rem;
+      gap: 2rem;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .member {
+      position: relative;
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid #0ff;
+      margin: 1rem;
+      padding: 1rem;
+      width: 200px;
+      height: 280px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #0ff;
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .member:hover {
+      transform: scale(1.05);
+    }
+
+    .member img {
+      border-radius: 50%;
+      border: 2px solid #0ff;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 1rem;
+      object-fit: cover;
+    }
+
+    .co-leader-badge {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0ff;
+      color: #000;
+      font-weight: bold;
+      font-size: 0.8rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      box-shadow: 0 0 5px #0ff;
+      pointer-events: none;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #0ff;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    Loading Rust server...
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Chat Sidebar -->
+  <div class="chat-box" id="chat-box" style="display:none;">
+    <h2>🗨️ Stream Chat</h2>
+
+    <div class="chat-message" data-name="@OilRats" data-text="Neon Clan door camped me for 40 minutes 😭"></div>
+    <div class="chat-message" data-name="@Snowmers" data-text="Bro they trap bases with shotgun traps everywhere 💀"></div>
+    <div class="chat-message" data-name="@Spinky" data-text="I logged in and got roof camped instantly by Echo 😒"></div>
+    <div class="chat-message" data-name="@SleepYak" data-text="NightWolf's base designs are insane 🔥"></div>
+    <div class="chat-message" data-name="@N00bMaster69" data-text="They counter every raid like it’s scripted 💢"></div>
+    <div class="chat-message" data-name="@StreamerDan" data-text="GhostReaper hit me mid-air... hacker confirmed?"></div>
+    <div class="chat-message" data-name="@LagBeast" data-text="I got offline raided... AGAIN by Neon 😤"></div>
+
+    <div class="chat-message" data-name="@Welyn" data-text="I heard they don't sleep during wipe"></div>
+    <div class="chat-message" data-name="@Bchillz" data-text='They renamed my bags to "NPC"'></div>
+    <div class="chat-message" data-name="@Kaptain" data-text="They logged in and my base collapsed"></div>
+    <div class="chat-message" data-name="@RustAcademy" data-text="My team logged off when they joined"></div>
+    <div class="chat-message" data-name="@Helk" data-text="They griefed our raid base before we finished it"></div>
+    <div class="chat-message" data-name="@Bald" data-text="They’re the reason I don’t play solo anymore"></div>
+    <div class="chat-message" data-name="@Garrett" data-text="They barked in voice chat and I froze"></div>
+    <div class="chat-message" data-name="@Blue" data-text="They own launch site and my soul"></div>
+    <div class="chat-message" data-name="@Welyn" data-text="I think they are a myth — no way they’re this real"></div>
+    <div class="chat-message" data-name="@Bchillz" data-text="They soft-side walls just to humiliate you"></div>
+    <div class="chat-message" data-name="@Kaptain" data-text="They griefed my bunker and then danced on my corpse"></div>
+    <div class="chat-message" data-name="@RustAcademy" data-text='Respawned to find "owned by them" on my door'></div>
+    <div class="chat-message" data-name="@Helk" data-text="They clan made me uninstall"></div>
+    <div class="chat-message" data-name="@Bald" data-text="I gave my entire box of sulfur to them out of fear"></div>
+    <div class="chat-message" data-name="@Garrett" data-text="They log in, server dies"></div>
+    <div class="chat-message" data-name="@Blue" data-text="They clan camped my base for 3 hours"></div>
+    <div class="chat-message" data-name="@Welyn" data-text="They doorcamped me while writing poems in chat"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main" style="display:none;">
+    <header>
+      <div class="neon-logo">LANDLORD</div>
+
+      <div id="server-status">Loading server queue...</div>
+      <div class="buttons">
+        <button onclick="window.open('https://discord.gg/bs75CXT9wV', '_blank')">Join Clan</button>
+        <button onclick="window.open('https://steamcommunity.com/groups/dotrust/discussions/0/135512931350565953/', '_blank')">Clan Rules</button>
+        <button>Watch Streams</button>
+      </div>
+    </header>
+
+    <section class="members">
+      <div class="member">
+        <div class="co-leader-badge">Co-Leader</div>
+        <img src="https://avatars.akamai.steamstatic.com/554c44c8086da12bd8900ee212bc651e53e656fd_full.jpg" alt="Kroeq" />
+        <h2>Kroeq</h2>
+        <p>Sniper & Recon</p>
+      </div>
+      <div class="member">
+        <div class="co-leader-badge">Co-Leader</div>
+        <img src="https://avatars.akamai.steamstatic.com/6e3a60a831a58cf5af413e9dc92d4cd090bf91a5_full.jpg" alt="Reality" />
+        <h2>Reality</h2>
+        <p>Base Builder</p>
+      </div>
+      <div class="member">
+        <img src="https://via.placeholder.com/100" alt="ZeroByte" />
+        <h2>ZeroByte</h2>
+        <p>Raider</p>
+      </div>
+      <div class="member">
+        <img src="https://via.placeholder.com/100" alt="Echo" />
+        <h2>Echo</h2>
+        <p>Scout & Intel</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Show loading screen until everything is loaded
+    window.addEventListener('load', () => {
+      const loadingScreen = document.getElementById('loading-screen');
+      const chatBox = document.getElementById('chat-box');
+      const main = document.querySelector('.main');
+
+      // Fade out loading screen
+      loadingScreen.style.transition = 'opacity 1s ease';
+      loadingScreen.style.opacity = 0;
+
+      setTimeout(() => {
+      loadingScreen.style.display = 'none';
+      chatBox.style.display = 'flex';
+      main.style.display = 'flex';
+
+        // Start showing chat messages
+        showMessages();
+        fetchServerQueue();
+        setInterval(fetchServerQueue, 60000);
+      }, 1000);
+    });
+
+    // Typing Animation Script
+    const messages = document.querySelectorAll('.chat-message');
+    let current = 0;
+
+    function typeMessage(element, text, speed = 20) {
+      return new Promise((resolve) => {
+        let i = 0;
+        element.style.display = 'block';
+        element.classList.add('show');
+        element.innerHTML = '';
+
+        const label = document.createElement('strong');
+        label.textContent = element.getAttribute('data-name') + ': ';
+        const content = document.createElement('span');
+
+        element.appendChild(label);
+        element.appendChild(content);
+
+        function typeChar() {
+          if (i < text.length) {
+            content.textContent += text.charAt(i);
+            i++;
+            setTimeout(typeChar, speed);
+          } else {
+            resolve();
+          }
+        }
+        typeChar();
+      });
+    }
+
+    async function showMessages() {
+      const chatBox = document.getElementById('chat-box');
+      for (; current < messages.length; current++) {
+        const message = messages[current];
+        const text = message.getAttribute('data-text');
+        await typeMessage(message, text);
+        // Smooth auto scroll
+        chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+        await new Promise(r => setTimeout(r, 1500));
+      }
+    }
+
+    // BattleMetrics Server Queue Script
+    async function fetchServerQueue() {
+      const serverId = "11378166";
+      const statusDiv = document.getElementById('server-status');
+      try {
+        const response = await fetch(`https://api.battlemetrics.com/servers/${serverId}`);
+        const data = await response.json();
+        const players = data.data.attributes.players;
+        const maxPlayers = data.data.attributes.maxPlayers;
+        const queuedPlayers = data.data.attributes.details.queuePlayers || 0;
+        const serverName = data.data.attributes.name || "Rust Server";
+
+        statusDiv.innerHTML = `<strong>${serverName}</strong><br>🧭 Players: ${players}/${maxPlayers} | Queue: ${queuedPlayers}`;
+      } catch (err) {
+        console.error(err);
+        statusDiv.innerHTML = "⚠️ Failed to load server data.";
+      }
+    }
+  </script>
+</body>
+</html>
