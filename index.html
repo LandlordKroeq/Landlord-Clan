@@ -37,7 +37,6 @@
       user-select: none;
     }
 
-    /* Rust-style rotating spinner */
     .spinner {
       margin-top: 2rem;
       width: 60px;
@@ -56,7 +55,6 @@
       100% { transform: rotate(360deg);}
     }
 
-    /* Main layout */
     .chat-box {
       width: 320px;
       background: linear-gradient(145deg, #001111, #003333);
@@ -140,7 +138,6 @@
       flex-shrink: 0;
     }
 
-    /* Neon Landlords Logo styles */
     .neon-logo {
       font-size: 4rem;
       font-weight: bold;
@@ -220,8 +217,8 @@
       border: 1px solid #0ff;
       margin: 1rem;
       padding: 1rem;
-      width: 200px;
-      height: 280px;
+      width: 220px;
+      max-height: 280px;       /* added max height */
       text-align: center;
       border-radius: 10px;
       box-shadow: 0 0 10px #0ff;
@@ -258,6 +255,13 @@
       pointer-events: none;
     }
 
+    .member .description {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: #b0ffff;
+      text-shadow: 0 0 5px #0ff;
+    }
+
     ::-webkit-scrollbar {
       width: 8px;
     }
@@ -273,48 +277,19 @@
   </style>
 </head>
 <body>
-  <!-- Loading Screen -->
   <div id="loading-screen">
     Loading Rust server...
     <div class="spinner"></div>
   </div>
 
-  <!-- Chat Sidebar -->
   <div class="chat-box" id="chat-box" style="display:none;">
     <h2>🗨️ Stream Chat</h2>
-
-    <div class="chat-message" data-name="@OilRats" data-text="Neon Clan door camped me for 40 minutes 😭"></div>
-    <div class="chat-message" data-name="@Snowmers" data-text="Bro they trap bases with shotgun traps everywhere 💀"></div>
-    <div class="chat-message" data-name="@Spinky" data-text="I logged in and got roof camped instantly by Echo 😒"></div>
-    <div class="chat-message" data-name="@SleepYak" data-text="NightWolf's base designs are insane 🔥"></div>
-    <div class="chat-message" data-name="@N00bMaster69" data-text="They counter every raid like it’s scripted 💢"></div>
-    <div class="chat-message" data-name="@StreamerDan" data-text="GhostReaper hit me mid-air... hacker confirmed?"></div>
-    <div class="chat-message" data-name="@LagBeast" data-text="I got offline raided... AGAIN by Neon 😤"></div>
-
-    <div class="chat-message" data-name="@Welyn" data-text="I heard they don't sleep during wipe"></div>
-    <div class="chat-message" data-name="@Bchillz" data-text='They renamed my bags to "NPC"'></div>
-    <div class="chat-message" data-name="@Kaptain" data-text="They logged in and my base collapsed"></div>
-    <div class="chat-message" data-name="@RustAcademy" data-text="My team logged off when they joined"></div>
-    <div class="chat-message" data-name="@Helk" data-text="They griefed our raid base before we finished it"></div>
-    <div class="chat-message" data-name="@Bald" data-text="They’re the reason I don’t play solo anymore"></div>
-    <div class="chat-message" data-name="@Garrett" data-text="They barked in voice chat and I froze"></div>
-    <div class="chat-message" data-name="@Blue" data-text="They own launch site and my soul"></div>
-    <div class="chat-message" data-name="@Welyn" data-text="I think they are a myth — no way they’re this real"></div>
-    <div class="chat-message" data-name="@Bchillz" data-text="They soft-side walls just to humiliate you"></div>
-    <div class="chat-message" data-name="@Kaptain" data-text="They griefed my bunker and then danced on my corpse"></div>
-    <div class="chat-message" data-name="@RustAcademy" data-text='Respawned to find "owned by them" on my door'></div>
-    <div class="chat-message" data-name="@Helk" data-text="They clan made me uninstall"></div>
-    <div class="chat-message" data-name="@Bald" data-text="I gave my entire box of sulfur to them out of fear"></div>
-    <div class="chat-message" data-name="@Garrett" data-text="They log in, server dies"></div>
-    <div class="chat-message" data-name="@Blue" data-text="They clan camped my base for 3 hours"></div>
-    <div class="chat-message" data-name="@Welyn" data-text="They doorcamped me while writing poems in chat"></div>
+    <!-- your chat messages here -->
   </div>
 
-  <!-- Main Content -->
   <div class="main" style="display:none;">
     <header>
       <div class="neon-logo">LANDLORD</div>
-
       <div id="server-status">Loading server queue...</div>
       <div class="buttons">
         <button onclick="window.open('https://discord.gg/bs75CXT9wV', '_blank')">Join Clan</button>
@@ -329,22 +304,26 @@
         <img src="https://avatars.akamai.steamstatic.com/554c44c8086da12bd8900ee212bc651e53e656fd_full.jpg" alt="Kroeq" />
         <h2>Kroeq</h2>
         <p>Sniper & Recon</p>
+        <div class="description">Begs Akuma to farm, Base Bitch.</div>
       </div>
       <div class="member">
         <div class="co-leader-badge">Co-Leader</div>
         <img src="https://avatars.akamai.steamstatic.com/6e3a60a831a58cf5af413e9dc92d4cd090bf91a5_full.jpg" alt="Reality" />
         <h2>Reality</h2>
         <p>Base Builder</p>
+        <div class="description">P2 Born Allergic to the word farm.</div>
       </div>
       <div class="member">
         <img src="https://via.placeholder.com/100" alt="ZeroByte" />
         <h2>ZeroByte</h2>
         <p>Raider</p>
+        <div class="description">Fearless raider known for breaching enemy defenses with surgical precision.</div>
       </div>
       <div class="member">
         <img src="https://via.placeholder.com/100" alt="Echo" />
         <h2>Echo</h2>
         <p>Scout & Intel</p>
+        <div class="description">Specializes in gathering intel and tracking rival clans across the map.</div>
       </div>
     </section>
   </div>
@@ -361,9 +340,9 @@
       loadingScreen.style.opacity = 0;
 
       setTimeout(() => {
-      loadingScreen.style.display = 'none';
-      chatBox.style.display = 'flex';
-      main.style.display = 'flex';
+        loadingScreen.style.display = 'none';
+        chatBox.style.display = 'flex';
+        main.style.display = 'flex';
 
         // Start showing chat messages
         showMessages();
